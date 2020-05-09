@@ -56,6 +56,7 @@
     <Compile Include="PTKSOFT.lib\udp.cs" />
     <Compile Include="PTKSOFT.lib\zlog.cs" />
     <Compile Include="RUN.cs" />
+    <Compile Include="TERMINAL.cs" />
     <Compile Include="that.cs" />
   </ItemGroup>
   <ItemGroup>

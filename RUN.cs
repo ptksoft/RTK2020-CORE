@@ -81,6 +81,12 @@ namespace MAIN
 			bool isTrigSave = false;
 			LastConfigModifyTime = Config[KW.LastConfigUpdateTime];
 			
+			#region Terminal
+			if (____ValidateAndInitValue(KW.TerminalListenIp, "0.0.0.0")) isTrigSave = true;
+			if (____ValidateAndInitValue(KW.TerminalListenPort, "44222")) isTrigSave = true;
+			if (____ValidateAndInitValue(KW.TerminalMaxWorker, "3")) isTrigSave = true;
+			#endregion
+			
             // Every verification OK
             if (isTrigSave) TrickSaveConfig();
 			return (true);
@@ -102,6 +108,11 @@ namespace MAIN
 			Config[KW.PathLogFile] = my.program_path() + Path.DirectorySeparatorChar + "LOGs";
 			Config[KW.InstantBindPort] = "51630";	// Port for Instant Bind
 			
+			#region TERMINAL
+			Config[KW.TerminalListenIp] = "0.0.0.0";
+			Config[KW.TerminalListenPort] = "44222";
+			Config[KW.TerminalMaxWorker] = "3";
+			#endregion
 
 			/* Try Save Configuration file */
 			return (Config.save_to_file(fileConfigName));

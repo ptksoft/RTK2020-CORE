@@ -16,6 +16,9 @@ namespace PTKSOFT.Lib
 	public delegate void RemoteDataArrivalEvent(byte[] data);
 	public delegate void RemoteLineArrivalEvent(string line);
 
+	/*
+	 * 2020-05-09	Add feature to set main thread name
+	 */
 	public class RemoteClientTCP
 	{
 		private Thread _mainThread;
@@ -44,16 +47,17 @@ namespace PTKSOFT.Lib
 		public event RemoteDataArrivalEvent OnRemoteDataArrival = null;
 		public event RemoteLineArrivalEvent OnRemoteLineArrival = null;
 
-		public RemoteClientTCP(string hostName, int hostPort)
+		public RemoteClientTCP(string hostName, int hostPort, string nameTherad)
 		{
 			if (hostName.Length > 0) _hostName = hostName;
 			if (hostPort > 0) _hostPort = hostPort;
 
 			_mainThread = new Thread(new ThreadStart(MainThread));
 			_mainThread.IsBackground = true;
-			_mainThread.Name = "TcpClientThread";
+			_mainThread.Name = nameTherad;
 			_mainThread.Start();
 		}
+		public RemoteClientTCP(string hostName, int hostPort) : this(hostName, hostPort, "TcpClientThread") {}
 		public RemoteClientTCP() : this("", 0) { }
 		public void Open()
 		{

@@ -11,6 +11,10 @@ using System.Windows.Forms;
 namespace PTKSOFT.Lib
 {
     //------------------------------------------------------------------------
+    /*
+	 *	2020-05-09	Add ability to set nameServer for use as name of each thread 
+	 *
+	 */
     public class TcpServerThreadPool
     {
         // Private flage
@@ -29,8 +33,8 @@ namespace PTKSOFT.Lib
         protected Form frmInvoke = null;
 
         // Thread variables 
-        private int _maxPoolingThred = 10;
-        private Thread[] _poolingThread;
+        private int _maxWorkerThread = 10;
+        private Thread[] _workerThread;
         private Thread _listenThread;
         private Thread _counter5SecThread;
 
@@ -45,6 +49,7 @@ namespace PTKSOFT.Lib
         protected decimal _statAvrClientLine = 0M;
 
         // PUBLIC Propertie(s)
+        public string nameServer = "TCP_SERVER";		// Name to be show in zLog thread Name
         public decimal statAvrClientConnect { get { return (_statAvrClientConnect); } }
         public decimal statAvrClientErrorAccept { get { return (_statAvrClientErrorAccept); } }
         public decimal statAvrClientDisconnect { get { return (_statAvrClientDisconnect); } }
@@ -60,9 +65,9 @@ namespace PTKSOFT.Lib
         public TcpServerThreadPool() : this(null) { }
 
         // Public Method(s)
-        public bool start(string ipAddress, int portNum, int maxPoolingThread) {	/*{{{
+        public bool start(string ipAddress, int portNum, int maxWorkingThread) {	/*{{{
 			*/
-            this._maxPoolingThred = maxPoolingThread;
+            this._maxWorkerThread = maxWorkingThread;
             return (this.start(ipAddress, portNum));
         }	/*}}}*/
         public bool start(string ipAddress, int portNum) {	/*{{{
@@ -73,6 +78,7 @@ namespace PTKSOFT.Lib
                 this.ipAddress = IPAddress.Parse(ipAddress);
                 this.portNum = portNum;
                 this._listenThread = new Thread(new ThreadStart(this.thread_listen));
+                this._listenThread.Name = this.nameServer + "-Listener";
                 this._listenThread.IsBackground = true;
                 this._listenThread.Start();
                 this.trickListenFinish.WaitOne(5000, true);
@@ -82,17 +88,18 @@ namespace PTKSOFT.Lib
                 {   
                     // Start STAT Counter Thread
                     this._counter5SecThread = new Thread(new ThreadStart(this.thread_counter5Sec));
+                    this._counter5SecThread.Name = this.nameServer + "-Counter5Sec";
                     this._counter5SecThread.IsBackground = true;
                     this._counter5SecThread.Start();
                     
                     // Start Listen finish? then start Thread ReadWrite
-                    this._poolingThread = new Thread[this._maxPoolingThred];
-                    for (int i = 0; i < this._maxPoolingThred; i++)
+                    this._workerThread = new Thread[this._maxWorkerThread];
+                    for (int i = 0; i < this._maxWorkerThread; i++)
                     {
-                        this._poolingThread[i] = new Thread(new ThreadStart(this.thread_pooling));
-                        this._poolingThread[i].IsBackground = true;
-                        this._poolingThread[i].Name = "Client_Pooling_" + i.ToString();
-                        this._poolingThread[i].Start();
+                        this._workerThread[i] = new Thread(new ThreadStart(this.thread_pooling));
+                        this._workerThread[i].Name = this.nameServer + "-Worker_" + i.ToString();
+                        this._workerThread[i].IsBackground = true;
+                        this._workerThread[i].Start();
                     }
                 }
 
@@ -107,14 +114,14 @@ namespace PTKSOFT.Lib
 			*/
             this.isTerminate = true;
 
-            for (int i = 0; i < this._maxPoolingThred; i++)
+            for (int i = 0; i < this._maxWorkerThread; i++)
             {
                 if (
-                    this._poolingThread[i] != null &&
-                    this._poolingThread[i].IsAlive
+                    this._workerThread[i] != null &&
+                    this._workerThread[i].IsAlive
                     )
                 {
-                    this._poolingThread[i].Join();
+                    this._workerThread[i].Join();
                 }
             }
 

@@ -33,6 +33,9 @@ namespace MAIN
 
 			// Initialize Global Vars
 			that.Init_Global_Vars();
+			
+			// Init Terminal
+			if (! TERMINAL.InitAll()) return;
 
 			// Enter Main LOOP	----------------------------------------------------------------------------
 			zlog.info(that.Version + " ... Ready");
