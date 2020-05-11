@@ -13,11 +13,11 @@ namespace MAIN
 	class Program
 	{
 		static void Main(string[] args)
-		{
+		{			
 			// Init Program version information
 			that.Version += " (version " + Assembly.GetEntryAssembly().GetName().Version.ToString() + ")";
 			Console.Title = that.Version;
-
+			
 			// Initialize Configuration
 			if (!RUN.InitAll())
 			{ Console.WriteLine("ERROR! Cannot init configuration file/folder/value"); return; }
@@ -62,6 +62,7 @@ namespace MAIN
 				}
 			}
 			Console.WriteLine("Terminate @ " + my.datetime_to_sql(DateTime.Now));
+			Thread.Sleep(1500);
 		}
 	}
 }
